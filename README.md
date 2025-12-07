@@ -1,2 +1,2 @@
-# Lukas-sms
-Lukas Nursery Scouting Management System
+# VINE
+Virtual Intelligence for Nursery Excellence
