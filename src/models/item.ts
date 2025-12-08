@@ -6,5 +6,5 @@ export interface Item {
 }
 
 export interface CreateItemDTO {
-  updated_at?: string | Date | null;
+}
 }
