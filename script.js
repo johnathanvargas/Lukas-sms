@@ -835,6 +835,10 @@ function showCalculatorTab(tab) {
 // ====== MIX CALCULATOR TAB (DYNAMIC MULTI-CHEMICAL + COVERAGE) ======
 function renderMixCalculatorTab(targetEl) {
   const content = targetEl || document.getElementById('content');
+
+  if (typeof window.chemicals === 'undefined') {
+    showLoadingTarget(content, 'Loading chemical data for Mix Calculator…');
+    ensureChemicalsAvailable()
       .then(() => renderMixCalculatorTab(targetEl))
       .catch(() => { if (content) content.innerHTML = '<p>Failed to load chemical data.</p>'; });
     return;
