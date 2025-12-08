@@ -2337,3 +2337,8 @@ const chemicals = [
     "defaultRatePerGallon": null
   }
 ];
+
+// Export to window for use by other scripts
+if (typeof window !== 'undefined') {
+  window.chemicals = chemicals;
+}
