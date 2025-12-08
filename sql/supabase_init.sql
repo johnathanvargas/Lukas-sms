@@ -1,6 +1,5 @@
 -- Basic schema for Lukas-VINE
-
-create extension if not exists pgcrypto; -- for gen_random_uuid() in some Postgres setups
+create extension if not exists pgcrypto;
 
 create table if not exists users (
   id uuid primary key default gen_random_uuid(),
@@ -34,5 +33,4 @@ create table if not exists logs (
   created_at timestamptz default now()
 );
 
--- Simple index to speed up searches on common_name
 create index if not exists idx_plants_common_name on plants using gin (to_tsvector('english', coalesce(common_name,'')));
