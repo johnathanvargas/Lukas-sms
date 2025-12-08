@@ -44,7 +44,7 @@ This guide will walk you through connecting your Lukas-VINE project to Supabase 
 7) Using the Supabase client in server code
 - server/supabaseClient.js uses SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY for server-side operations
 - Example usage:
-  const supabase = require('./server/supabaseClient')
+  const supabase = require('./supabaseClient')
   const { data, error } = await supabase.from('plants').select('*')
 
 8) Deploy to Render
