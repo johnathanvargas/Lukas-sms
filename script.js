@@ -340,8 +340,8 @@ function showPage(page) {
         </button>
         <button type="button"
                 class="tools-menu-item home-quick-link"
-                onclick="showPage('mix')">
-          🧪 Mix Calculator
+                onclick="showPage('calculators')">
+          🧪 Calculators
         </button>
       </div>
 
@@ -437,15 +437,22 @@ function showPage(page) {
   }
 
   // For other pages, cross fade into the appropriate renderer
+  if (page === 'calculators') {
+    smoothTransition(() => {
+      renderCalculators();
+    });
+    return;
+  }
+  // Redirect old routes to new consolidated calculators page
   if (page === 'mix') {
     smoothTransition(() => {
-      renderMixCalculator();
+      renderCalculators('mix');
     });
     return;
   }
   if (page === 'granular') {
     smoothTransition(() => {
-      renderGranularHelper();
+      renderCalculators('granular');
     });
     return;
   }
@@ -765,18 +772,100 @@ document.addEventListener('keydown', function (evt) {
   }
 });
 
-// ====== MIX CALCULATOR (DYNAMIC MULTI-CHEMICAL + COVERAGE) ======
-function renderMixCalculator() {
+// ====== CALCULATORS (CONSOLIDATED MIX & GRANULAR) ======
+
+/**
+ * Render the consolidated Calculators page with tabs for Mix Calculator and Granular Helper
+ * @param {string} defaultTab - Which calculator to show by default ('mix' or 'granular')
+ */
+function renderCalculators(defaultTab) {
+  const content = document.getElementById('content');
+  if (!content) return;
+
+  // Check if chemicals data is available
   if (typeof window.chemicals === 'undefined') {
-    const content = document.getElementById('content');
-    showLoadingTarget(content, 'Loading chemical data for Mix Calculator…');
+    showLoadingTarget(content, 'Loading chemical data for Calculators…');
     ensureChemicalsAvailable()
-      .then(() => renderMixCalculator())
+      .then(() => renderCalculators(defaultTab))
       .catch(() => { if (content) content.innerHTML = '<p>Failed to load chemical data.</p>'; });
     return;
   }
 
+  content.innerHTML = `
+    <h2>Calculators</h2>
+    <p class="muted">
+      Calculate chemical mixes and granular applications. Always verify rates on the current product label.
+    </p>
+
+    <div class="logs-tabs" role="tablist" aria-label="Mix Calculator and Granular Helper">
+      <button type="button"
+              class="logs-tab-btn logs-tab-active"
+              data-tab="mix"
+              role="tab"
+              aria-selected="true"
+              onclick="showCalculatorTab('mix')">
+        Mix Calculator
+      </button>
+      <button type="button"
+              class="logs-tab-btn"
+              data-tab="granular"
+              role="tab"
+              aria-selected="false"
+              onclick="showCalculatorTab('granular')">
+        Granular Helper
+      </button>
+    </div>
+
+    <div id="calculatorBody" class="logs-body" role="tabpanel" aria-live="polite"></div>
+  `;
+
+  const initial = defaultTab === 'granular' ? 'granular' : 'mix';
+  showCalculatorTab(initial);
+}
+
+/**
+ * Switch between calculator tabs
+ * @param {string} tab - 'mix' or 'granular'
+ */
+function showCalculatorTab(tab) {
+  const body = document.getElementById('calculatorBody');
+  if (!body) return;
+
+  const buttons = document.querySelectorAll('.logs-tabs .logs-tab-btn');
+  buttons.forEach(btn => {
+    const btnTab = btn.getAttribute('data-tab');
+    const isActive = btnTab === tab;
+    btn.classList.toggle('logs-tab-active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+
+  if (tab === 'granular') {
+    renderGranularHelperContent(body);
+  } else {
+    renderMixCalculatorContent(body);
+  }
+}
+
+// ====== MIX CALCULATOR (DYNAMIC MULTI-CHEMICAL + COVERAGE) ======
+function renderMixCalculator() {
   const content = document.getElementById('content');
+  renderMixCalculatorContent(content);
+}
+
+/**
+ * Render Mix Calculator content into a target element
+ * @param {HTMLElement} targetEl - Target element to render into
+ */
+function renderMixCalculatorContent(targetEl) {
+  if (!targetEl) return;
+
+  if (typeof window.chemicals === 'undefined') {
+    showLoadingTarget(targetEl, 'Loading chemical data for Mix Calculator…');
+    ensureChemicalsAvailable()
+      .then(() => renderMixCalculatorContent(targetEl))
+      .catch(() => { if (targetEl) targetEl.innerHTML = '<p>Failed to load chemical data.</p>'; });
+    return;
+  }
 
   // Build a sorted list of non‑granular chemicals for the Mix Calculator dropdown.
   // Store both the raw data and the HTML options string globally so that
@@ -800,7 +889,7 @@ function renderMixCalculator() {
   // reset row count each time we open the Mix page
   mixChemRowCount = 0;
 
-  content.innerHTML = `
+  targetEl.innerHTML = `
     <h2>Mix Calculator</h2>
     <p class="muted">
       Select one or more chemicals and enter your tank size in gallons.
@@ -1100,6 +1189,15 @@ function calculateMix() {
 // ====== GRANULAR HELPER (GRANULAR PRODUCT CALCULATOR) ======
 function renderGranularHelper() {
   const content = document.getElementById('content');
+  renderGranularHelperContent(content);
+}
+
+/**
+ * Render Granular Helper content into a target element
+ * @param {HTMLElement} targetEl - Target element to render into
+ */
+function renderGranularHelperContent(targetEl) {
+  if (!targetEl) return;
 
   // Build a sorted list of granular products for selection
   const granularProducts = chemicals
@@ -1116,7 +1214,7 @@ function renderGranularHelper() {
     ...granularProducts.map(c => `<option value="${c.id}">${c.name}</option>`)
   ].join('');
 
-  content.innerHTML = `
+  targetEl.innerHTML = `
     <h2>Granular Helper</h2>
     <p class="muted">
       Calculate how much granular product you need based on area and label rate.
