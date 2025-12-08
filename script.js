@@ -439,7 +439,7 @@ function showPage(page) {
   // For other pages, cross fade into the appropriate renderer
   if (page === 'calculators') {
     smoothTransition(() => {
-      renderCalculators();
+      renderCalculators('mix'); // Default to Mix Calculator tab
     });
     return;
   }
