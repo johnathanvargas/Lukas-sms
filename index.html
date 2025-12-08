@@ -93,6 +93,13 @@
   var scriptTag = document.createElement('script');
   scriptTag.src = addCacheBuster('./script.js');
   scriptTag.async = true;
+  // Initialize home page after script loads to ensure quick-links appear
+  scriptTag.onload = function() {
+    if (typeof showPage === 'function') {
+      var hash = window.location.hash.replace('#', '').trim();
+      showPage(hash || 'home');
+    }
+  };
   document.head.appendChild(scriptTag);
 
   // Idle-prefetch data assets using requestIdleCallback or timeout fallback

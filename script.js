@@ -2363,9 +2363,10 @@ function filterLogReview() {
 
 
 // ====== RESTORE LAST PAGE ON LOAD ======
+// Note: Initial page load is now handled by index.html's script onload handler
+// to ensure script.js is fully loaded before showPage() is called.
+// This listener serves as a fallback for edge cases and handles hash changes.
 document.addEventListener('DOMContentLoaded', () => {
-  const hash = window.location.hash.replace('#', '').trim();
-
   // Preload plant master so diagnostics and dropdowns have data ready
   if (window.loadPlants) {
     window.loadPlants().catch(err => {
@@ -2373,10 +2374,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (hash) {
-    showPage(hash);
-  } else {
-    showPage('home');
+  // Only initialize if not already done (prevents duplicate initialization)
+  const content = document.getElementById('content');
+  if (content && content.innerHTML.includes('Select a section above to begin.')) {
+    const hash = window.location.hash.replace('#', '').trim();
+    if (hash) {
+      showPage(hash);
+    } else {
+      showPage('home');
+    }
   }
 });
 
