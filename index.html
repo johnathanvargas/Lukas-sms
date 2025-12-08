@@ -96,6 +96,10 @@
   // Initialize home page after script loads to ensure quick-links appear
   scriptTag.onload = function() {
     if (typeof showPage === 'function') {
+      // Set the pageInitialized flag to prevent duplicate initialization
+      if (typeof window.pageInitialized !== 'undefined') {
+        window.pageInitialized = true;
+      }
       var hash = window.location.hash.replace('#', '').trim();
       showPage(hash || 'home');
     }
