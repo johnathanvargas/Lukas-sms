@@ -1,6 +1,7 @@
 export interface Item {
   id: string;
-  // ... other existing fields for items
+  name: string;
+  description?: string;
   created_at?: string | Date | null;
   updated_at?: string | Date | null; // newly tracked field
 }
