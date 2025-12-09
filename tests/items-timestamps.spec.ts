@@ -20,7 +20,7 @@ describe('Items Table Timestamps', () => {
 
   beforeAll(async () => {
     // Verify that items table exists and has required columns
-    const { data: columns, error } = await supabase
+    const { error } = await supabase
       .rpc('get_table_columns', { table_name: 'items' })
       .select('column_name');
 
