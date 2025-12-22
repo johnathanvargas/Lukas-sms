@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Transform to simpler format
-    const results = diagnostics.map((d) => ({
+    const results = diagnostics.map((d: any) => ({
       plantName: d.plant.commonName,
       diagnosis: d.diagnosis,
       recommendedAction: d.recommendedAction,
